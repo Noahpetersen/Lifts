@@ -2,9 +2,18 @@
     include_once("env.php");
     $conn = new mysqli($servername, $username, $password, $database, $port);
 
-    function startSession($persistant = false) {
-        session_set_cookie_params($persistant ? 604800 : 0, '/', '', false);
+    function startSession(string $email, $persistant = false) {
+        session_set_cookie_params([
+            "lifetime" => $persistant ? 60 * 60 * 24 * 30 : 0, // 30 days if persistent
+            "path" => "/",
+            "domain" => "",  // Leave empty for automatic domain setting
+            "secure" => true,  // Set to true in production with HTTPS
+            "httponly" => true,  // Prevent JavaScript access // Allow cross-origin requests
+            "samesite" => "none"  // Prevent CSRF
+        ]);
+    
         session_start();
+        $_SESSION['user'] = $email;
     }
 
     function userSignUp($email, $password, $username) {
@@ -62,12 +71,10 @@
         if(password_verify($password, $row['password'])) {
             $response = array(
                 "success" => true,
-                "message" => "User signed in"
+                "message" => $row['email']
             );
     
-            startSession($remember);
-
-            
+            startSession($email, $remember);
 
             return $response;
         }

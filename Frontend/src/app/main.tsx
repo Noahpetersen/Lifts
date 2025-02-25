@@ -5,14 +5,18 @@ import App from './App.tsx'
 import Home from './Pages/Home.tsx'
 import SignUp from './Pages/Signup.tsx'
 import SignIn from './Pages/Signin.tsx'
+import AuthProvider from '../contexts/AuthContext.tsx'
+import ProtectedRoute from '../routes/ProtectedRoute.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <BrowserRouter>
-    <Routes>
-      <Route path="/" element={<App/>} />
-      <Route path="/home" element={<Home/>} />
-      <Route path="/signup" element={<SignUp/>} />
-      <Route path="/signin" element={<SignIn/>} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<ProtectedRoute><App/></ProtectedRoute>}/>
+        <Route path="/home" element={<ProtectedRoute><Home/></ProtectedRoute>} />
+        <Route path="/signup" element={<SignUp/>} />
+        <Route path="/signin" element={<SignIn/>} />
+      </Routes>
+    </AuthProvider>
   </BrowserRouter>
 )

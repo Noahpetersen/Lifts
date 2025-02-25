@@ -1,7 +1,11 @@
+import { useEffect } from 'react'
 import './App.css'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../contexts/AuthContext';
 
 function App() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -9,6 +13,7 @@ function App() {
         <NavLink to="/home" end>
           <h1>Home</h1>
         </NavLink>
+        <button onClick={() => logout()}>Sign in</button>
       </div>
     </>
   )

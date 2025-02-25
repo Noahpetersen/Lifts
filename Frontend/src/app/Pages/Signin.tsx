@@ -1,5 +1,6 @@
 import { useRef } from "react"
 import { NavLink } from "react-router-dom"
+import { useAuth } from "../../contexts/AuthContext"
 
 interface Credentials {
   email: string,
@@ -8,6 +9,8 @@ interface Credentials {
 }
 
 const Login = () => {
+    const { login } = useAuth()
+
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const rememberMeRef = useRef<HTMLInputElement>(null)
@@ -15,40 +18,41 @@ const Login = () => {
     const HandleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-      const email = emailRef.current?.value
-      const password = passwordRef.current?.value
-      const remember = rememberMeRef.current?.checked
+    const email = emailRef.current?.value
+    const password = passwordRef.current?.value
+    const remember = rememberMeRef.current?.checked
 
-      if (!email || !password) {
-          alert('Please fill all fields')
-          return
+    if (!email || !password) {
+        alert('Please fill all fields')
+        return
+    }
+
+    const credentials: Credentials = {
+        email,
+        password,
+        remember
+    }
+
+    try {
+      const response = await fetch('/api/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(credentials)
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        login(data)
+        alert(data)
+      } else {
+        const data = await response.json()
+        alert(data)
       }
-
-      const credentials: Credentials = {
-          email,
-          password,
-          remember
-      }
-
-      try {
-        const response = await fetch('http://127.0.0.1:8000/api/signin', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(credentials)
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          alert(data)
-        } else {
-          const data = await response.json()
-          alert(data)
-        }
-      } catch (error) {
-        console.error(error)
-      }
+    } catch (error) {
+      console.error(error)
+    }
 
 
 
@@ -59,7 +63,7 @@ const Login = () => {
   return (
     <div className='container mx-auto bg-zinc-700 rounded-2xl p-8'>
         <h1 className='mb-10'>Signup</h1>
-        <form className='flex flex-col space-y-6 min-w-80 text-zinc-900' onSubmit={HandleLogin}>
+        <form className='flex flex-col space-y-6 text-zinc-900' onSubmit={HandleLogin}>
             <input ref={emailRef} type='text' placeholder='email' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800 ' />
             <input ref={passwordRef} type='password' placeholder='Password' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800' />
             <div className="flex items-center">
