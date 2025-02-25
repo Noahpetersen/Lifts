@@ -1,20 +1,18 @@
-import { useEffect } from 'react'
 import './App.css'
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext';
+import { Route, Routes} from 'react-router-dom'
+import ProtectedRoute from '../routes/ProtectedRoute';
+import Home from './Pages/Home';
+import SignUp from './Pages/Signup';
+import SignIn from './Pages/Signin';
 
 function App() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
   return (
     <>
-      <div>
-        <NavLink to="/home" end>
-          <h1>Home</h1>
-        </NavLink>
-        <button onClick={() => logout()}>Sign in</button>
-      </div>
+      <Routes>
+        <Route path="/" element={<ProtectedRoute><Home/></ProtectedRoute>}/>
+        <Route path="/signup" element={<SignUp/>} />
+        <Route path="/signin" element={<SignIn/>} />
+      </Routes>
     </>
   )
 }

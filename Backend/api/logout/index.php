@@ -3,11 +3,16 @@
     header("Content-Type: application/json");
     header("Access-Control-Allow-Credentials: true");
 
-    // Destroy session
+    // Clear all session variables
+    $_SESSION = [];
+
+    // Destroy the session
     session_destroy();
 
-    // Remove cookie
-    setcookie("session_id", "", time() - 3600, "/");
+    // Remove session cookie properly
+    if (isset($_COOKIE[session_name()])) {
+        setcookie(session_name(), "", time() - 3600, "/", "", true, true); // Secure & HTTP-only
+    }
 
     echo json_encode(["success" => true]);
 ?>

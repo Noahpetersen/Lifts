@@ -1,5 +1,5 @@
-import { useRef } from "react"
-import { NavLink } from "react-router-dom"
+import { useEffect, useRef } from "react"
+import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext"
 
 interface Credentials {
@@ -9,54 +9,57 @@ interface Credentials {
 }
 
 const Login = () => {
-    const { login } = useAuth()
+    const { user, login } = useAuth()
+    const navigate = useNavigate()
 
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const rememberMeRef = useRef<HTMLInputElement>(null)
 
+    useEffect(() => {
+        if (user) {
+          navigate('/')
+        }
+    })
+
     const HandleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
-    const email = emailRef.current?.value
-    const password = passwordRef.current?.value
-    const remember = rememberMeRef.current?.checked
+      const email = emailRef.current?.value
+      const password = passwordRef.current?.value
+      const remember = rememberMeRef.current?.checked
 
-    if (!email || !password) {
-        alert('Please fill all fields')
-        return
-    }
-
-    const credentials: Credentials = {
-        email,
-        password,
-        remember
-    }
-
-    try {
-      const response = await fetch('/api/signin', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(credentials)
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        login(data)
-        alert(data)
-      } else {
-        const data = await response.json()
-        alert(data)
+      if (!email || !password) {
+          alert('Please fill all fields')
+          return
       }
-    } catch (error) {
-      console.error(error)
-    }
 
+      const credentials: Credentials = {
+          email,
+          password,
+          remember
+      }
 
+      try {
+        const response = await fetch('/api/signin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(credentials)
+        })
 
-
+        if (response.ok) {
+          const data = await response.json()
+          login(data)
+          navigate('/')
+        } else {
+          const data = await response.json()
+          alert(data)
+        }
+      } catch (error) {
+        console.error(error)
+      }
     }
 
 

@@ -1,5 +1,6 @@
-import { useRef } from 'react'
-import { NavLink } from 'react-router-dom'
+import { useEffect, useRef } from 'react'
+import { NavLink, useNavigate } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 
 interface newUser {
   username: string,
@@ -8,9 +9,18 @@ interface newUser {
 }
 
 const SignUp = () => {
+  const { user, login } = useAuth()
+  const navigate = useNavigate()
+
   const usernameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+          if (user) {
+            navigate('/')
+          }
+      })
 
   const HandleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

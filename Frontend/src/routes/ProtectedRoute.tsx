@@ -9,7 +9,7 @@ const ProtectedRoute = ({children} : {children : ReactNode}) => {
     return <p>Loading...</p>; // ✅ Prevents early redirect
   }
 
-  return user ? children : <Navigate to="/signup" />;
+  return user ? children : <Navigate to="/signin" />;
 };
 
 export default ProtectedRoute;

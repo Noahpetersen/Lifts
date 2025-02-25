@@ -1,8 +1,12 @@
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../../contexts/AuthContext'
 
 const Home = () => {
+  const { logout } = useAuth()
+
+
   return (
-    <NavLink to="/">Start</NavLink>
+    <button className='cursor-pointer' onClick={logout}>Logout</button>
   )
 }
 

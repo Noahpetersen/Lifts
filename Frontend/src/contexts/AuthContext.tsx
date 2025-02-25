@@ -47,7 +47,7 @@ const AuthProvider = ({children} : {children: ReactNode}) => {
     };
 
     const logout = () => {
-        const response = fetch("/api/check-session", {
+        const response = fetch("/api/logout", {
             method: "POST",
             credentials: "include",
         });
