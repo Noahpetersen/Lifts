@@ -16,6 +16,22 @@
         $_SESSION['user'] = $email;
     }
 
+    function GetUserByEmail($email) {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "SELECT * FROM users WHERE email = ?");
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        if(mysqli_num_rows($result) > 0) {
+            return mysqli_fetch_assoc($result);
+        }
+        else {
+            return null;
+        }
+    }
+
     function userSignUp($email, $password, $username) {
         global $conn;
 
@@ -85,6 +101,46 @@
             );
 
             return $response;
+        }
+    }
+
+    function CreateSession($title, $exercises, $userID) {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "INSERT INTO sessions (user_id, name) VALUES (?, ?)");
+        mysqli_stmt_bind_param($stmt, "is", $userID, $title);
+        mysqli_stmt_execute($stmt);
+        $sessionID = mysqli_insert_id($conn);
+        
+        PopulateExercises($exercises, $sessionID);
+
+    }
+
+    function PopulateExercises($exercises, $sessionID) {
+        global $conn;
+
+        foreach($exercises as $index => $exercise) {
+            $exerciseID = null;
+
+            $stmt = mysqli_prepare($conn, "SELECT * FROM exercises WHERE name = ?");
+            mysqli_stmt_bind_param($stmt, "s", $exercise->name);
+            mysqli_stmt_execute($stmt);
+            $result = mysqli_stmt_get_result($stmt);
+
+            if(mysqli_num_rows($result) == 0) {
+                $stmt = mysqli_prepare($conn, "INSERT INTO exercises (name) VALUES (?)");
+                mysqli_stmt_bind_param($stmt, "s", $exercise->name);
+                mysqli_stmt_execute($stmt);
+
+                $exerciseID = mysqli_insert_id($conn);
+            }
+            else {
+                $exerciseID = mysqli_fetch_assoc($result)['id'];
+            }
+
+            $stmt = mysqli_prepare($conn, "INSERT INTO session_exercises (session_id, exercise_id, sets_count, order_index) VALUES (?, ?, ?, ?)");
+            mysqli_stmt_bind_param($stmt, "iiii", $sessionID, $exerciseID, $exercise->sets, $index);
+            mysqli_stmt_execute($stmt);
         }
     }
 ?>

@@ -20,7 +20,7 @@ const SignUp = () => {
           if (user) {
             navigate('/')
           }
-      })
+  })
 
   const HandleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
