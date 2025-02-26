@@ -4,7 +4,7 @@ import { Exercise } from '../types/exercises'
 import { useAuth } from '../../contexts/AuthContext'
 
 type CreateSessionProps = {
-    title: string;
+    title: string | undefined;
     user: string;
     exercises: Exercise[];
 };
@@ -15,7 +15,7 @@ const CreateSession = () => {
   
   const [exercises, setExercises] = useState<Exercise[]>([]);
 
-  const sessionTitleRef = useRef<string>('')
+  const sessionTitleRef = useRef<HTMLInputElement>(null)
 
     const HandleFormSubmit = () => {
 
@@ -24,7 +24,7 @@ const CreateSession = () => {
       }
 
       const sessionProps: CreateSessionProps = {
-        title: sessionTitleRef.current,
+        title: sessionTitleRef.current?.value,
         user,
         exercises
       }
@@ -45,7 +45,7 @@ const CreateSession = () => {
 
   return (
     <div>
-        <input type="text" className='bg-white placeholder:text-zinc-700 text-zinc-900' placeholder='Session Title'/>
+        <input ref={sessionTitleRef} type="text" className='bg-white placeholder:text-zinc-700 text-zinc-900' placeholder='Session Title'/>
         <AddExercises exercises={exercises} setExercises={setExercises}/>
         <button className='bg-sky-700 p-2 rounded-2xl' onClick={HandleFormSubmit}>Create Session</button>
     </div>
