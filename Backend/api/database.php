@@ -143,4 +143,21 @@
             mysqli_stmt_execute($stmt);
         }
     }
+
+    function GetSessionsByUser($userID) {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "SELECT * FROM sessions WHERE user_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $userID);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        $sessions = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $sessions[] = $row;
+        }
+
+        return $sessions;
+    }
 ?>
