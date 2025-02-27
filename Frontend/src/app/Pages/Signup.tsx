@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { useMutation } from '@tanstack/react-query'
 
 interface newUser {
   username: string,
@@ -11,15 +12,32 @@ interface newUser {
 const SignUp = () => {
   const { user, login } = useAuth()
   const navigate = useNavigate()
+  
+  const signup = useMutation({
+    mutationFn: (newUser: newUser) => {
+        return fetch('/api/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newUser)
+        })
+    },
+    onSuccess: async (response) => {
+      const data = await response.json()
+      login(data)
+      navigate('/signin')
+    },
+  })
 
   const usernameRef = useRef<HTMLInputElement>(null)
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-          if (user) {
-            navigate('/')
-          }
+    if (user) {
+      navigate('/')
+    }
   })
 
   const HandleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,21 +58,7 @@ const SignUp = () => {
       password
     }
 
-    const response = await fetch('/api/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newUser)
-    })
-    
-    if (response.ok) {
-      const data = await response.json()
-      alert(data)
-    } else {
-      const data = await response.json()
-      alert(data)
-    }
+    signup.mutate(newUser);
   };
 
   return (
@@ -67,7 +71,7 @@ const SignUp = () => {
             <button type="submit" className='p-2 text-white rounded-lg bg-zinc-900 hover:bg-sky-700 cursor-pointer transition duration-300'>Signup</button>
         </form>
         <NavLink to={"/signin"}>
-          <p className='mt-4'>already have an account? Sign in</p>
+          <p className='mt-4'>already have an account? <span className='font-bold'>Sign in</span></p>
         </NavLink>
     </div>
   )

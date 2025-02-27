@@ -6,7 +6,7 @@ const ProtectedRoute = ({children} : {children : ReactNode}) => {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <p>Loading...</p>; // ✅ Prevents early redirect
+    return <p>Loading...</p>;
   }
 
   return user ? children : <Navigate to="/signin" />;

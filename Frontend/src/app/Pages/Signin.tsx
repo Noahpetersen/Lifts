@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext"
+import { useMutation } from "@tanstack/react-query"
 
 interface Credentials {
   email: string,
@@ -15,6 +16,23 @@ const Login = () => {
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
     const rememberMeRef = useRef<HTMLInputElement>(null)
+
+    const signIn = useMutation({
+      mutationFn: (credentials: Credentials) => {
+        return fetch('/api/signin', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(credentials)
+        })
+      },
+      onSuccess: async (response) => {
+        const data = await response.json()
+        login(data)
+        navigate('/')
+      },
+    })
 
     useEffect(() => {
         if (user) {
@@ -40,26 +58,7 @@ const Login = () => {
           remember
       }
 
-      try {
-        const response = await fetch('/api/signin', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(credentials)
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          login(data)
-          navigate('/')
-        } else {
-          const data = await response.json()
-          alert(data)
-        }
-      } catch (error) {
-        console.error(error)
-      }
+      signIn.mutate(credentials);
     }
 
 
