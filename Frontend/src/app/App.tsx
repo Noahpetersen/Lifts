@@ -5,6 +5,7 @@ import Home from './Pages/Home';
 import SignUp from './Pages/Signup';
 import SignIn from './Pages/Signin';
 import CreateSession from './Pages/CreateSession';
+import { Toaster } from '@/components/ui/sonner';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/signin" element={<SignIn/>} />
         <Route path="/create" element={<ProtectedRoute><CreateSession/></ProtectedRoute>}/>
       </Routes>
+      <Toaster/>
     </>
   )
 }

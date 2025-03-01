@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useState, useContext, useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface AuthContextType {
     user: string | null;
@@ -21,7 +22,6 @@ async function checkSession() {
         const data = await res.json();
         return data.user || null;  // ✅ Return user properly
     } catch (error) {
-        console.error("Error:", error);
         return null; // ✅ Return null only in case of an error
     }
 }
@@ -32,9 +32,8 @@ const AuthProvider = ({children} : {children: ReactNode}) => {
 
     useEffect(() => {
         const fetchSession = async () => {
-            const user = await checkSession();  // ✅ Wait for the result
+            const user = await checkSession();
             setUser(user); 
-            console.log("User:", user);
             setIsLoading(false);
         };
 
@@ -43,16 +42,19 @@ const AuthProvider = ({children} : {children: ReactNode}) => {
 
     const login = (username: string) => {
         setUser(username)
-        console.log("Logged in as: ", username)
     };
 
-    const logout = () => {
-        const response = fetch("/api/logout", {
+    const logout = async () => {
+        const response = await fetch("/api/logout", {
             method: "POST",
             credentials: "include",
         });
 
-        setUser(null);
+        if (response.ok) {
+            setUser(null);
+        } else {
+            toast("Logout went wrong, try again.");
+        }
     };
     
 

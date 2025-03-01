@@ -33,6 +33,7 @@ const Home = () => {
             )
           })}
         </ul>
+        <button className='cursor-pointer' onClick={logout}>Logout</button>
       </div>
     )
   }
