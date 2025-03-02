@@ -160,4 +160,20 @@
 
         return $sessions;
     }
+
+    function GetAllExercises() {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "SELECT * FROM exercises");
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        $exercises = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $exercises[] = $row;
+        }
+
+        return $exercises;
+    }
 ?>
