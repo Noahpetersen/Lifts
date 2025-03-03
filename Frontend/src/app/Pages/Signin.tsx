@@ -1,7 +1,10 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { NavLink, useNavigate } from "react-router-dom"
 import { useAuth } from "../../contexts/AuthContext"
 import { useMutation } from "@tanstack/react-query"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import SigninForm from "../components/SigninForm"
+import { toast } from "sonner"
 
 interface Credentials {
   email: string,
@@ -13,10 +16,6 @@ const Login = () => {
     const { user, login } = useAuth()
     const navigate = useNavigate()
 
-    const emailRef = useRef<HTMLInputElement>(null)
-    const passwordRef = useRef<HTMLInputElement>(null)
-    const rememberMeRef = useRef<HTMLInputElement>(null)
-
     const signIn = useMutation({
       mutationFn: (credentials: Credentials) => {
         return fetch('/api/signin', {
@@ -27,58 +26,53 @@ const Login = () => {
           body: JSON.stringify(credentials)
         })
       },
-      onSuccess: async (response) => {
-        const data = await response.json()
-        login(data)
-        navigate('/')
-      },
     })
+
+    const { status } = signIn
 
     useEffect(() => {
-        if (user) {
-          navigate('/')
+      if (user) {
+        navigate('/')
+      }
+    }, [user])
+
+    const HandleLogin = async (credentials: Credentials) => {
+      signIn.mutate(credentials, {
+        onSuccess: async (response) => {
+          if(response.ok) {
+            const data = await response.json()
+            login(data)
+          }
+          else {
+            toast('Oops! Wrong credentials, try again.')
+          }
+
+        },
+        onError: () => {
+          toast('Oops! Something went wrong, try again.')
         }
-    })
-
-    const HandleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-
-      const email = emailRef.current?.value
-      const password = passwordRef.current?.value
-      const remember = rememberMeRef.current?.checked
-
-      if (!email || !password) {
-          alert('Please fill all fields')
-          return
-      }
-
-      const credentials: Credentials = {
-          email,
-          password,
-          remember
-      }
-
-      signIn.mutate(credentials);
+      });
     }
+
+    useEffect(() => {
+      if(status === 'error') {
+        toast('Invalid email or password')
+      }
+    }, [status])
 
 
   return (
-    <div className='container mx-auto bg-zinc-700 rounded-2xl p-8'>
-        <h1 className='mb-10'>Signup</h1>
-        <form className='flex flex-col space-y-6 text-zinc-900' onSubmit={HandleLogin}>
-            <input ref={emailRef} type='text' placeholder='email' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800 ' />
-            <input ref={passwordRef} type='password' placeholder='Password' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800' />
-            <div className="flex items-center">
-              <input ref={rememberMeRef} name="rememberMe"type='checkbox' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800' />
-              <label htmlFor="rememberMe" className='ml-2 text-zinc-200'>Remember Me</label>
-            </div>
-            <button type="submit" className='p-2 text-white rounded-lg bg-zinc-900 hover:bg-sky-700 cursor-pointer transition duration-300'>Sign In</button>
-        </form>
-        <NavLink to={"/signup"}>
-          <p className='mt-4'>Sign Up</p>
-        </NavLink>
+    <div className='container mx-auto rounded-2xl p-8 h-dvh flex flex-col  justify-center'>
+          <Card className="p-8">
+            <CardHeader className="p-0">
+              <CardTitle className="text-2xl">Sign In</CardTitle>
+              <CardDescription>Enter your email and password to sign in</CardDescription>
+            </CardHeader>
+            <SigninForm HandleLogin={HandleLogin}/>
+          </Card>
     </div>
   )
+  
 }
 
 export default Login

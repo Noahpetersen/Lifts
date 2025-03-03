@@ -3,6 +3,9 @@ import AddExercises from '../components/AddExercises'
 import { Exercise } from '../types/exercises'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMutation } from '@tanstack/react-query'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import Navbar from '../components/Navbar'
 
 type CreateSessionProps = {
     title: string | undefined;
@@ -46,11 +49,14 @@ const CreateSession = () => {
     }
 
   return (
-    <div>
-        <input ref={sessionTitleRef} type="text" className='bg-white placeholder:text-zinc-700 text-zinc-900' placeholder='Session Title'/>
+    <>
+    <Navbar/>
+    <div className='flex flex-col h-dvh gap-4 p-6'>
+        <Input ref={sessionTitleRef} type="text" className="h-15 text-lg mb-2 font-bold" placeholder='Session Title'/>
         <AddExercises exercises={exercises} setExercises={setExercises}/>
-        <button className='bg-sky-700 p-2 rounded-2xl' onClick={HandleSessionSubmission}>Create Session</button>
+        <Button onClick={HandleSessionSubmission} className='mt-auto h-12 text-lg'>Create Session</Button>
     </div>
+    </>
   )
 }
 

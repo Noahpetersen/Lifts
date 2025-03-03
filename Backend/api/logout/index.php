@@ -14,5 +14,6 @@
         setcookie(session_name(), "", time() - 3600, "/", "", true, true); // Secure & HTTP-only
     }
 
+    http_response_code(200);
     echo json_encode(["success" => true]);
 ?>

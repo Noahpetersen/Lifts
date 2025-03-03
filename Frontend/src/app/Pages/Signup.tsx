@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useMutation } from '@tanstack/react-query'
+import SignupForm from '../components/SignupForm'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface newUser {
   username: string,
@@ -24,15 +26,13 @@ const SignUp = () => {
         })
     },
     onSuccess: async (response) => {
-      const data = await response.json()
-      login(data)
-      navigate('/signin')
+      if (response.ok) {
+        const data = await response.json()
+        login(data)
+        navigate('/signin')
+      }
     },
   })
-
-  const usernameRef = useRef<HTMLInputElement>(null)
-  const emailRef = useRef<HTMLInputElement>(null)
-  const passwordRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (user) {
@@ -40,39 +40,19 @@ const SignUp = () => {
     }
   })
 
-  const HandleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const username = usernameRef.current?.value 
-    const email = emailRef.current?.value
-    const password = passwordRef.current?.value
-
-    if (!username || !email || !password) {
-      alert('Please fill all fields')
-      return
-    }
-
-    const newUser: newUser = {
-      username,
-      email,
-      password
-    }
-
+  const HandleSignup = async (newUser: newUser) => {
     signup.mutate(newUser);
   };
 
   return (
-    <div className='container mx-auto bg-zinc-700 rounded-2xl p-8'>
-        <h1 className='mb-10'>Signup</h1>
-        <form className='flex flex-col space-y-6 min-w-80 text-zinc-900' onSubmit={HandleSignup}>
-            <input ref={usernameRef} type='text' placeholder='Username' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800 ' />
-            <input ref={emailRef} type='email' placeholder='Email' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800' />
-            <input ref={passwordRef} type='password' placeholder='Password' className='p-2 rounded-lg bg-zinc-300 placeholder:text-zinc-800' />
-            <button type="submit" className='p-2 text-white rounded-lg bg-zinc-900 hover:bg-sky-700 cursor-pointer transition duration-300'>Signup</button>
-        </form>
-        <NavLink to={"/signin"}>
-          <p className='mt-4'>already have an account? <span className='font-bold'>Sign in</span></p>
-        </NavLink>
+    <div className='container mx-auto rounded-2xl p-8 h-dvh flex flex-col  justify-center'>
+        <Card className="p-8">
+          <CardHeader className="p-0">
+            <CardTitle className="text-2xl">Sign In</CardTitle>
+            <CardDescription>Create your account and get started!</CardDescription>
+          </CardHeader>
+          <SignupForm HandleSignup={HandleSignup}/>
+        </Card>
     </div>
   )
 }
