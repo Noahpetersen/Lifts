@@ -57,6 +57,7 @@ export function Combobox({ type = "One", data = [{label: "Add", value: "add"}], 
                 key={"Add"}
                 value={"Add"}
                 onSelect={handleSelect}
+                className="cursor-pointer"
                 >
                 {"Add"}
                 <Check
@@ -71,6 +72,7 @@ export function Combobox({ type = "One", data = [{label: "Add", value: "add"}], 
                 key={item.value}
                 value={item.value}
                 onSelect={handleSelect}
+                className="cursor-pointer"
                 >
                 {item.label}
                 <Check

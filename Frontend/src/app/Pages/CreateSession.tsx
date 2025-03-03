@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext'
 import { useMutation } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import Navbar from '../components/Navbar'
 
 type CreateSessionProps = {
     title: string | undefined;
@@ -48,11 +49,14 @@ const CreateSession = () => {
     }
 
   return (
+    <>
+    <Navbar/>
     <div className='flex flex-col h-dvh gap-4 p-6'>
         <Input ref={sessionTitleRef} type="text" className="h-15 text-lg mb-2 font-bold" placeholder='Session Title'/>
         <AddExercises exercises={exercises} setExercises={setExercises}/>
         <Button onClick={HandleSessionSubmission} className='mt-auto h-12 text-lg'>Create Session</Button>
     </div>
+    </>
   )
 }
 

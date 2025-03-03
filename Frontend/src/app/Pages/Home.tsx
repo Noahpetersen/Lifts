@@ -1,57 +1,69 @@
 import { data, NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import { useQuery } from '@tanstack/react-query'
+import { EffectCallback, useEffect } from 'react'
+import { Card } from '@/components/ui/card'
+import SessiontListItem from '../components/SessiontListItem'
+import Navbar from '../components/Navbar'
+import { Exercise } from '../types/exercises'
 
 type Session = {
   id: number,
   name: string,
+  exercises: Exercise[]
 }
 
 type Sessions = Session[]
 
 const Home = () => {
-  const { logout } = useAuth()
-  const navigate = useNavigate()
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
-  const {data, isFetched, isError } = useQuery({
+  const { data: sessions, isFetched, isLoading, isError } = useQuery<Session[]>({
     queryKey: ['sessions'],
     queryFn: async () => {
-      const response = await fetch('/api/session/get')
-      return (await response.json()) as Session[]
-    }
-  })
+      const response = await fetch('/api/session/get');
+      if (!response.ok) throw new Error("Failed to fetch sessions");
+      return response.json();
+    },
+  });
 
-  if (isFetched && data) {
+  // Show loading state while fetching
+  if (isLoading) {
     return (
-      <div>
-        <ul>
-          {data.map((session) => {
-            return (
-              <li key={session.id}>
-                <p>{session.name}</p>
-              </li>
-            )
-          })}
-        </ul>
-        <button className='cursor-pointer' onClick={logout}>Logout</button>
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p>Loading sessions...</p>
       </div>
-    )
+    );
   }
 
-  if (isError) {
+  // Handle error state
+  if (isError || !sessions || sessions.length === 0) {
     return (
-      <div>
-        <p>You dont have any sessions yet.</p>
-        <button onClick={() => {navigate('/create')}}>Create Session</button>
-      </div>)
+      <div className="flex flex-col items-center justify-center h-screen">
+        <p>You don't have any sessions yet.</p>
+        <button onClick={() => navigate('/create')}>Create Session</button>
+      </div>
+    );
   }
 
-  return (
-    <div className='flex flex-col items-center justify-center h-screen'>
-      <button onClick={() => {navigate('/create')}}>Create Session</button>
-      <button className='cursor-pointer' onClick={logout}>Logout</button>
-    </div>
-  )
-}
+  if(isFetched) {
+    console.log(sessions)
+  }
 
-export default Home
+  // Successfully fetched sessions
+  return (
+    <>
+    <Navbar />
+    <div className="flex flex-col items-center h-dvh p-6">
+      <ul className='w-full space-y-5'>
+        {sessions.map((session) => (
+            <SessiontListItem key={session.id} sessionName={"Pull day"} numberOfExercises={session.exercises.length}/>
+        ))}
+      </ul>
+    </div>
+    </>
+  );
+};
+
+export default Home;
