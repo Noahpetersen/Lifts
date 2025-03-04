@@ -1,12 +1,24 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/AuthContext";
+import { useEffect, useState } from "react";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+  const location = useLocation();
+
+  const [isHomePage, setIsHomePage] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      setIsHomePage(true);
+    } else {
+      setIsHomePage(false);
+    }
+  }, [location]);
 
   const handleBack = () => {
     navigate(-1); // Navigate to previous page
@@ -18,9 +30,10 @@ const Navbar = () => {
 
   return (
     <nav className="sticky bg-[var(--background)] top-0 z-50shadow-md p-4 flex justify-between items-center border-b-1">
-      <Button variant="outline" onClick={handleBack} className="cursor-pointer">Back</Button>
+      {!isHomePage && <Button variant="outline" onClick={handleBack} className="cursor-pointer">Back</Button>}
       
-      <DropdownMenu >
+      <div className="flex-grow"></div>
+      <DropdownMenu>
         <DropdownMenuTrigger>
           <Avatar>
             <AvatarImage src="/placeholder-avatar.png" alt="User" className="cursor-pointer"/>
@@ -40,6 +53,7 @@ const Navbar = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      
     </nav>
   );
 };

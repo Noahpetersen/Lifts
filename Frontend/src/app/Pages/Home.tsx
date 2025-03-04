@@ -28,6 +28,10 @@ const Home = () => {
     },
   });
 
+  const StartSession = (session: Session) => {
+    navigate(`/session/${session.id}`);
+  };
+
   // Show loading state while fetching
   if (isLoading) {
     return (
@@ -58,7 +62,7 @@ const Home = () => {
     <div className="flex flex-col items-center h-dvh p-6">
       <ul className='w-full space-y-5'>
         {sessions.map((session) => (
-            <SessiontListItem key={session.id} sessionName={"Pull day"} numberOfExercises={session.exercises.length}/>
+            <SessiontListItem onClick={() => StartSession(session)} key={session.id} sessionName={session.name} numberOfExercises={session.exercises.length}/>
         ))}
       </ul>
     </div>

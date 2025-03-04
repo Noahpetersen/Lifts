@@ -7,12 +7,13 @@ type SessionListItemProps = {
   key: number;
   sessionName: string;
   numberOfExercises: number;
+  onClick?: (() => void);
 };
 
-const SessionListItem: React.FC<SessionListItemProps> = ({ key, sessionName, numberOfExercises }) => {
+const SessionListItem: React.FC<SessionListItemProps> = ({ key, sessionName, numberOfExercises, onClick }) => {
 
   return (
-    <li key={key}>
+    <li key={key} onClick={onClick}>
       <Card className='py-5  flex flex-col gap-15 cursor-pointer'>
         <CardHeader>
           <Label>{sessionName}</Label>
