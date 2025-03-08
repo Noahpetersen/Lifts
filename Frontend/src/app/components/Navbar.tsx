@@ -29,7 +29,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="sticky bg-[var(--background)] top-0 z-50shadow-md p-4 flex justify-between items-center border-b-1 z-100">
+    <nav className="sticky bg-[var(--background)] top-0 shadow-md p-4 flex justify-between items-center border-b-1 z-100">
       {!isHomePage && <Button variant="outline" onClick={handleBack} className="cursor-pointer">Back</Button>}
       
       <div className="flex-grow"></div>

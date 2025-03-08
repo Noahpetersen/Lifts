@@ -1,11 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import playButton from "../../assets/play-button-arrowhead.png"
-import pauseButton from "../../assets/pause.png";
-import reset from "../../assets/undo.png";
 
-export default function Timer() {
+export default function Timer({ setIsOpen }: { setIsOpen: (open: boolean) => void }) {
   const [time, setTime] = useState(0); // Time in seconds
   const [isRunning, setIsRunning] = useState(false);
 
@@ -19,6 +15,7 @@ export default function Timer() {
     } else {
       clearInterval(timer);
     }
+
     return () => clearInterval(timer);
   }, [isRunning]);
 
@@ -29,21 +26,23 @@ export default function Timer() {
   };
 
   return (
-    <Card className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full border-b-0 border-r-0 border-l-0">
-        <div className=" max-w-sm text-white px-6 rounded-xl shadow-lg flex items-center justify-between">
-            <span className="text-5xl">{formatTime(time)}</span>
-            <div className="flex gap-2 ml-auto">
-              <Button
-                  className="w-12 h-12 rounded-full flex items-center justify-center"
-                  onClick={() => setIsRunning(!isRunning)}
-              >
-                  <img src={isRunning ? pauseButton : playButton} alt="" className="w-full h-full object-contain" />
-              </Button>
-              <Button onClick={() => { setIsRunning(false); setTime(0); }} className="w-12 h-12 rounded-full flex items-center justify-center">
-                  <img src={reset} className="w-full h-full object-contain"/>
-              </Button>
-            </div>
-        </div>
-    </Card>
+    <div className="max-w-sm text-white px-6 rounded-xl flex flex-col shadow-lg items-center justify-between gap-6">
+      <span className="text-5xl">{formatTime(time)}</span>
+      <footer className="w-full">
+        {!isRunning ? (
+          <Button onClick={() => setIsRunning(true)} className="w-full mb-2">
+            {time === 0 ? "Start" : "Resume"}
+          </Button>
+        ) : (
+          <Button onClick={() => setIsRunning(false)} className="w-full mb-2">
+            Pause
+          </Button>
+        )}
+
+        <Button variant="outline" onClick={() => setIsOpen(false)} className="w-full">
+          Cancel
+        </Button>
+      </footer>
+    </div>
   );
 }

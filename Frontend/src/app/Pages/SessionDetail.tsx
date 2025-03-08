@@ -9,6 +9,8 @@ import Loading from "../components/Loading";
 import SetDetails from "../components/SetDetails";
 import { Badge } from "@/components/ui/badge";
 import RegisterSetForm from "../components/RegisterSetForm";
+import { Drawer } from "@/components/ui/drawer";
+import TimerDrawer from "../components/TimerDrawer";
 
 type SetData= {
   weight: number,
@@ -48,6 +50,7 @@ const SessionDetail = () => {
   const [currentSetIndex, setCurrentSetIndex] = useState(1)
   const [currentExercise, setCurrentExercise] = useState<CurrentExercise>({name: "", currentSet: 0})
   const [progress, setProgress] = useState(0)
+  const [isTimerOpen, setIsTimerOpen] = useState<boolean>(false)
 
   const { data: session, isLoading, error, isFetched } = useQuery({
     queryKey: ["session", sessionId],
@@ -101,8 +104,14 @@ const SessionDetail = () => {
     else if (currentSetIndex === session[0].exercises[currentExerciseIndex].sets) {
       setCurrentExerciseIndex(currentExerciseIndex + 1);
       setCurrentSetIndex(1);
+
+      setIsTimerOpen(true);
+
+      window.scrollTo(0, 0);
     } else {
       setCurrentSetIndex(currentSetIndex + 1);
+      setIsTimerOpen(true);
+      window.scrollTo(0, 0);
     }
 
   } 
@@ -116,6 +125,9 @@ const SessionDetail = () => {
   return (
     <>
       <Navbar/>
+      <div className="relative">
+        <Progress value={progress} className="mb-6 sticky top-0"/>
+      </div>
       <div className="flex flex-col h-full p-10">
           <header className="flex flex-col pb-2">
               <h1 className="text-3xl font-bold mb-2">{session[0].name}</h1>
@@ -124,9 +136,6 @@ const SessionDetail = () => {
                 <Badge className="ml-auto">Set {currentSetIndex}</Badge>
               </div>
           </header>
-          <div>
-            <Progress value={progress} className="mb-6"/>
-          </div>
           <SetDetails 
             sessionExerciseID={session[0].exercises[currentExerciseIndex].session_exercise_id} 
             exerciseSet={currentSetIndex}
@@ -137,6 +146,8 @@ const SessionDetail = () => {
         exerciseSet={currentSetIndex}
         registerSetData={registerSetData}
       />
+      <TimerDrawer isOpen={isTimerOpen} setIsOpen={setIsTimerOpen}/>
+
     </>
   );
 };

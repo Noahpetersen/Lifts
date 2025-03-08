@@ -81,7 +81,7 @@ const SetDetailsTable: React.FC<SetDetailsTableProps> = ({setHistory = []}) => {
                 </TableHeader>
                 <TableBody>
                     {setTableData && setTableData.map((set, index) => (
-                        console.log(set),
+                        //console.log(set),
                         <TableRow key={index}>
                             <TableCell>{set.createdAt}</TableCell>
 
