@@ -7,7 +7,7 @@ type SetHistory = {
     weight: number,
     reps: number,
     isRepsHigherThanPrevious?: boolean | null,
-    isWeightHigherThanPrevious?: boolean,
+    isWeightHigherThanPrevious?: boolean | null,
 }
 
 type SetDetailsTableProps = {
@@ -27,14 +27,16 @@ const SetDetailsTable: React.FC<SetDetailsTableProps> = ({setHistory = []}) => {
             const previousSet = reversedSetHistory[index - 1]; 
     
             if (previousSet) {
-                const previousSetHasSameWeight = previousSet.weight === set.weight;
+                const setWeight = Math.round(set.weight * 100) / 100;
+                const previousSetWeight = Math.round(previousSet.weight * 100) / 100;
+
+                const previousSetHasSameWeight = previousSetWeight === setWeight;
                 const previousSetHasMoreRepsOnSameWeight = previousSetHasSameWeight ? previousSet.reps < set.reps : null;
-                console.log(index, previousSetHasMoreRepsOnSameWeight, set.reps);
-    
+                
                 return {
                     ...set,
                     isRepsHigherThanPrevious: previousSetHasMoreRepsOnSameWeight,
-                    isWeightHigherThanPrevious: set.weight > previousSet.weight
+                    isWeightHigherThanPrevious: previousSetHasSameWeight ? null : setWeight > previousSetWeight
                 };
             }
     
@@ -86,9 +88,7 @@ const SetDetailsTable: React.FC<SetDetailsTableProps> = ({setHistory = []}) => {
                             <TableCell>
                                 <div className="flex items-center gap-1">
                                     <p>{set.weight}</p>
-                                    <svg className={set.isWeightHigherThanPrevious ? 'visible' : 'opacity-0'} width="10" height="10" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M0.749899 4.75H5.2499C5.29546 4.74985 5.34012 4.73729 5.37907 4.71365C5.41802 4.69002 5.44979 4.6562 5.47095 4.61586C5.49211 4.57551 5.50187 4.53016 5.49918 4.48467C5.49648 4.43919 5.48143 4.39531 5.45565 4.35775L3.20565 1.10775C3.1124 0.972996 2.8879 0.972996 2.7944 1.10775L0.544399 4.35775C0.518356 4.39523 0.503083 4.43914 0.500241 4.48469C0.497398 4.53025 0.507095 4.57572 0.528278 4.61615C0.54946 4.65658 0.581318 4.69043 0.62039 4.71403C0.659462 4.73763 0.704254 4.75007 0.749899 4.75Z" fill="#13A100"/>
-                                    </svg>
+                                    {getRepsIndicator(set.isWeightHigherThanPrevious)}
                                 </div>
                             </TableCell>
 

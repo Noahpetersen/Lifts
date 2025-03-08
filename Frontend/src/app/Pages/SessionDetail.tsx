@@ -1,6 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import RegisterSetForm from "../components/RegisterSetForm";
 import CurrentDate from "../components/CurrentDate";
 import { useEffect, useState } from "react";
 import Timer from "../components/Timer";
@@ -9,6 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import Loading from "../components/Loading";
 import SetDetails from "../components/SetDetails";
 import { Badge } from "@/components/ui/badge";
+import RegisterSetForm from "../components/RegisterSetForm";
 
 type SetData= {
   weight: number,
@@ -127,10 +127,16 @@ const SessionDetail = () => {
           <div>
             <Progress value={progress} className="mb-6"/>
           </div>
-          <SetDetails sessionExerciseID={session[0].exercises[currentExerciseIndex].session_exercise_id} exerciseSet={currentSetIndex}/>
-          <RegisterSetForm exercise={currentExercise} registerSetData={registerSetData}/>
-          
+          <SetDetails 
+            sessionExerciseID={session[0].exercises[currentExerciseIndex].session_exercise_id} 
+            exerciseSet={currentSetIndex}
+          />
       </div>
+      <RegisterSetForm 
+        sessionExerciseID={session[0].exercises[currentExerciseIndex].session_exercise_id} 
+        exerciseSet={currentSetIndex}
+        registerSetData={registerSetData}
+      />
     </>
   );
 };

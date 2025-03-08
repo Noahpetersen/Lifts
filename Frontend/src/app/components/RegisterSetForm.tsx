@@ -1,13 +1,9 @@
-import { Button } from '@/components/ui/button'
-import { Form } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { register } from 'module'
-import React, { useEffect } from 'react'
-import { useForm, SubmitHandler } from 'react-hook-form'
-import { toast } from 'sonner'
-import { z } from 'zod'
+import { Button } from '@/components/ui/button';
+import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useRef, useState } from 'react'
+import Loading from './Loading';
 
 type SetData = {
     weight: number;
@@ -15,68 +11,85 @@ type SetData = {
 }
 
 type RegisterSetFormProps = {
-    exercise: {name: string, currentSet: number},
     registerSetData: (setData: SetData) => void;
+    sessionExerciseID: number;
+    exerciseSet: number;
 }
 
-const setSchema = z.object({
-    weight: z.number().min(1, "Please enter a weight"),
-    reps: z.number().min(1, "Please enter the number of reps")
-})
+const RegisterSetForm: React.FC<RegisterSetFormProps> = ({registerSetData, sessionExerciseID, exerciseSet}) => {
+    const {data: setHistory, isPending} = useQuery({
+        queryKey: ['set', sessionExerciseID, exerciseSet],
+        queryFn: async () => {
+            const response = await fetch(`/api/set/get?sessionExerciseID=${sessionExerciseID}&exerciseSet=${exerciseSet}`)
+            if (!response.ok) {
+                throw new Error('Network response was not ok')
+            }
+            return response.json()
+        }
+    })
+    const lastWeight = setHistory && setHistory.length > 0 ? setHistory[0].weight : 0;
+    const currentReps = setHistory && setHistory.length > 0 ? setHistory[0].reps : 0;
+    
+    const [tabIndex, setTabIndex] = useState<number>(0);
+    const [weight, setWeight] = useState<number[]>([0]);
+    const [reps, setReps] = useState<number[]>([0]);
 
-type RegisterSetFormValues = z.infer<typeof setSchema>
+    const repsTabFocus = useRef<HTMLButtonElement>(null);
+    const weightTabFocus = useRef<HTMLButtonElement>(null);
 
-const RegisterSetForm: React.FC<RegisterSetFormProps> = ({exercise, registerSetData}) => {
-    const form = useForm<RegisterSetFormValues>({
-        resolver: zodResolver(setSchema),
-        defaultValues: {weight: 0, reps: 0}
-    });
+    useEffect(() => {
+        if (setHistory && setHistory.length > 0) {
+            setWeight([lastWeight]);
+            setReps([currentReps]);
+        }
+    }, [setHistory]);
 
-    const { handleSubmit, register, formState: {errors}
-     } = form;
+    const HandleNext = () => {
 
-    const HandleSetSubmission: SubmitHandler<RegisterSetFormValues> = (values: RegisterSetFormValues) => {
+        if(tabIndex === 0) {
+            setTabIndex(tabIndex + 1);
+            repsTabFocus.current?.focus();
+            return;
+        }
+
         const set = {
-            weight: values.weight,
-            reps: values.reps,
+            weight: weight[0],
+            reps: reps[0]
         }
 
         registerSetData(set)
-
-        form.setValue("weight", 0)
-        form.setValue("reps", 0)
+        setTabIndex(0);
+        weightTabFocus.current?.focus();
     }
 
-    useEffect(() => {
-        if(errors.weight) {
-            toast(errors.weight.message)
-        }
-        if(errors.reps) {
-            toast(errors.reps.message)
-        }
-    }, [errors])
+    if(isPending) {
+        return <Loading />
+    }
 
   return (
-    <>
-        <Form {...form} >
-            <form className='mx-auto mt-20' onSubmit={handleSubmit(HandleSetSubmission)}>
-                <div className='flex items-center gap-5'>
-                    <div className='flex flex-col gap-2'>
-                        <Label htmlFor="weight">Weight</Label>
-                        <Input {...register("weight", {valueAsNumber: true})} type="number" id='weight' name='weight' className='input h-15 w-25' />
-                    </div>
-                    <p className='text-4xl'>-</p>
-                    <div className='flex flex-col gap-2'>
-                        <Label htmlFor="reps">Reps</Label>
-                        <Input {...register("reps", {valueAsNumber: true})} type="number" id='reps' name='reps' className='input h-15 w-25' />
-                    </div>
-                    
-                </div>
-                <Button type="submit" className='mt-4 h-12 text-lg w-full'>Next</Button>
-            </form>
-        </Form>
-    </>
+    
+    <Tabs defaultValue={'weight'} className="w-full mt-2 px-10 py-6 border-t-1 gap-0 absolute bottom-0 bg-background sticky">
+        <TabsList className="flex w-full">
+            <TabsTrigger ref={weightTabFocus} onFocus={() => setTabIndex(0)} value="weight" className=" ">Weight</TabsTrigger>
+            <TabsTrigger ref={repsTabFocus} value="reps" className="">Reps</TabsTrigger>
+        </TabsList>
+        <TabsContent value="weight" className="w-full">
+            <div className='my-8'>
+                <p className='text-center text-4xl font-bold mb-5'>{weight} <span className="font-medium">KG</span></p>
+                <Slider defaultValue={weight} onValueChange={(value) => {setWeight(value)}}  min={0} max={100} step={5}/>
+            </div>
+            <Button onClick={HandleNext} className='mx-auto block w-full'>Next</Button>
+        </TabsContent>
+        <TabsContent value="reps" className="w-full">
+            <div className='my-8'>
+                <p className='text-center text-4xl font-bold mb-5'>{reps}</p>
+                <Slider defaultValue={reps} onValueChange={(value) => {setReps(value)}}  min={1} max={20} step={1}/>
+            </div>
+            <Button onClick={HandleNext} className='mx-auto block w-full'>Next</Button>
+        </TabsContent>
+    </Tabs>
   )
 }
+
 
 export default RegisterSetForm

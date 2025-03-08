@@ -10,7 +10,7 @@ type SetDetailsProps = {
 
 const SetDetails: React.FC<SetDetailsProps> = ({sessionExerciseID, exerciseSet}) => {
     const {data: setHistory, isFetched} = useQuery({
-        queryKey: ['set'],
+        queryKey: ['set', sessionExerciseID, exerciseSet],
         queryFn: async () => {
             const response = await fetch(`/api/set/get?sessionExerciseID=${sessionExerciseID}&exerciseSet=${exerciseSet}`)
             if (!response.ok) {

@@ -30,7 +30,7 @@ interface SetDetailsChartProps {
 const chartConfig = {
   weight: {
     label: "Weight",
-    color: "hsl(var(--primary))", // Primary theme color
+    color: "hsl(var(--primary))",
   },
 } satisfies ChartConfig;
 
