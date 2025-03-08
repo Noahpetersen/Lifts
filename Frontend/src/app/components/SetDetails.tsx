@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import React from 'react'
 import SetDetailsTable from './SetDetailsTable'
+import SetDetailsChart from './SetDetailsChart'
 
 type SetDetailsProps = {
     sessionExerciseID: number,
@@ -8,7 +9,7 @@ type SetDetailsProps = {
 }
 
 const SetDetails: React.FC<SetDetailsProps> = ({sessionExerciseID, exerciseSet}) => {
-    const {data: setHistory} = useQuery({
+    const {data: setHistory, isFetched} = useQuery({
         queryKey: ['set'],
         queryFn: async () => {
             const response = await fetch(`/api/set/get?sessionExerciseID=${sessionExerciseID}&exerciseSet=${exerciseSet}`)
@@ -18,11 +19,14 @@ const SetDetails: React.FC<SetDetailsProps> = ({sessionExerciseID, exerciseSet})
             return response.json()
         }
     })
+    
+    if (!isFetched) {
+        return <div>Loading...</div>
+    }
 
-    console.log(setHistory);
- 
   return (
-    <div>
+    <div className='flex flex-col gap-2'>
+        <SetDetailsChart chartData={setHistory}/>
         <SetDetailsTable setHistory={setHistory} />
     </div>
   )

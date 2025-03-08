@@ -21,11 +21,10 @@ const SetDetailsTable: React.FC<SetDetailsTableProps> = ({setHistory = []}) => {
     useEffect(() => {
         if (!setHistory || setHistory.length === 0) return;
     
-        // Reverse a copy of setHistory to modify in the correct order
         const reversedSetHistory = setHistory.slice().reverse();
     
         const newSetTableData = reversedSetHistory.map((set, index) => {
-            const previousSet = reversedSetHistory[index - 1]; // Now correctly references the previous set
+            const previousSet = reversedSetHistory[index - 1]; 
     
             if (previousSet) {
                 const previousSetHasSameWeight = previousSet.weight === set.weight;

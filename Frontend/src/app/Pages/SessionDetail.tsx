@@ -82,7 +82,7 @@ const SessionDetail = () => {
     const isLastExerciseSet = currentExerciseIndex === session[0].exercises.length - 1;
     const isLastSetInExercise = currentSetIndex === session[0].exercises[currentExerciseIndex].sets;
     const isLastSetInSession = isLastExerciseSet && isLastSetInExercise;
-    //console.log(set)
+    
     setSets((prevSets) => {
       const updatedSets = [...prevSets, set];
       
@@ -116,7 +116,7 @@ const SessionDetail = () => {
   return (
     <>
       <Navbar/>
-      <div className="flex flex-col h-screen p-10">
+      <div className="flex flex-col h-full p-10">
           <header className="flex flex-col pb-2">
               <h1 className="text-3xl font-bold mb-2">{session[0].name}</h1>
               <div className="flex items-center">
@@ -124,10 +124,12 @@ const SessionDetail = () => {
                 <Badge className="ml-auto">Set {currentSetIndex}</Badge>
               </div>
           </header>
-          <Progress value={progress} className="mb-6"/>
+          <div>
+            <Progress value={progress} className="mb-6"/>
+          </div>
           <SetDetails sessionExerciseID={session[0].exercises[currentExerciseIndex].session_exercise_id} exerciseSet={currentSetIndex}/>
           <RegisterSetForm exercise={currentExercise} registerSetData={registerSetData}/>
-          <Timer/>
+          
       </div>
     </>
   );
