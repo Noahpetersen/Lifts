@@ -58,10 +58,6 @@ const RegisterSetForm: React.FC<RegisterSetFormProps> = ({exercise, registerSetD
 
   return (
     <>
-        <div className='flex items-center mb-4'>
-            <h2 className='text-2xl font-bold'>{exercise.name}</h2>
-            <p className='ml-auto'>Set {exercise.currentSet}</p>
-        </div>
         <Form {...form} >
             <form className='mx-auto mt-20' onSubmit={handleSubmit(HandleSetSubmission)}>
                 <div className='flex items-center gap-5'>

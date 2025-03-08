@@ -270,5 +270,18 @@
         return $response;
     }
 
+    function GetSetHistory($sessionExerciseID, $setNumber) {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "SELECT weight, reps, DATE_FORMAT(created_at, '%d.%m.%Y') AS createdAt FROM sets WHERE session_exercise_id = ? AND set_number = ?
+                                ORDER BY created_at DESC"
+        );
+        mysqli_stmt_bind_param($stmt, "ii", $sessionExerciseID, $setNumber);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+
 ?>
 

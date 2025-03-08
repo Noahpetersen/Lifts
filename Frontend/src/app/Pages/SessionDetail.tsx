@@ -7,6 +7,8 @@ import Timer from "../components/Timer";
 import Navbar from "../components/Navbar";
 import { Progress } from "@/components/ui/progress";
 import Loading from "../components/Loading";
+import SetDetails from "../components/SetDetails";
+import { Badge } from "@/components/ui/badge";
 
 type SetData= {
   weight: number,
@@ -115,11 +117,15 @@ const SessionDetail = () => {
     <>
       <Navbar/>
       <div className="flex flex-col h-screen p-10">
-          <header className="flex items-center pb-3">
-              <h1 className="text-3xl font-bold">{session[0].name}</h1>
-              <CurrentDate className="ml-auto"/>
+          <header className="flex flex-col pb-2">
+              <h1 className="text-3xl font-bold mb-2">{session[0].name}</h1>
+              <div className="flex items-center">
+                <h2 className="">{currentExercise.name}</h2>
+                <Badge className="ml-auto">Set {currentSetIndex}</Badge>
+              </div>
           </header>
-          <Progress value={progress} className="mb-10"/>
+          <Progress value={progress} className="mb-6"/>
+          <SetDetails sessionExerciseID={session[0].exercises[currentExerciseIndex].session_exercise_id} exerciseSet={currentSetIndex}/>
           <RegisterSetForm exercise={currentExercise} registerSetData={registerSetData}/>
           <Timer/>
       </div>
