@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react'
 import Loading from './Loading';
+import { Input } from '@/components/ui/input';
 
 type SetData = {
     weight: number;
@@ -31,18 +32,25 @@ const RegisterSetForm: React.FC<RegisterSetFormProps> = ({registerSetData, sessi
     const currentReps = setHistory && setHistory.length > 0 ? setHistory[0].reps : 0;
     
     const [tabIndex, setTabIndex] = useState<number>(0);
-    const [weight, setWeight] = useState<number[]>([0]);
-    const [reps, setReps] = useState<number[]>([0]);
+    const [weight, setWeight] = useState<number>(0);
+    const [reps, setReps] = useState<number>(0);
 
     const repsTabFocus = useRef<HTMLButtonElement>(null);
     const weightTabFocus = useRef<HTMLButtonElement>(null);
 
+
     useEffect(() => {
         if (setHistory && setHistory.length > 0) {
-            setWeight([lastWeight]);
-            setReps([currentReps]);
+            setWeight(lastWeight);
+            setReps(currentReps);
         }
     }, [setHistory]);
+
+    const handleWeightChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // Remove non-numeric characters and set the weight
+        const value = e.target.value.replace(/[^0-9]/g, "");
+        setWeight(Number(value));
+    };
 
     const HandleNext = () => {
 
@@ -53,9 +61,10 @@ const RegisterSetForm: React.FC<RegisterSetFormProps> = ({registerSetData, sessi
         }
 
         const set = {
-            weight: weight[0],
-            reps: reps[0]
+            weight: weight,
+            reps: reps
         }
+        console.log(set)
 
         registerSetData(set)
         setTabIndex(0);
@@ -75,15 +84,32 @@ const RegisterSetForm: React.FC<RegisterSetFormProps> = ({registerSetData, sessi
         </TabsList>
         <TabsContent value="weight" className="w-full">
             <div className='my-8'>
-                <p className='text-center text-4xl font-bold mb-5'>{weight} <span className="font-medium">KG</span></p>
-                <Slider defaultValue={weight} onValueChange={(value) => {setWeight(value)}}  min={0} max={100} step={5}/>
+            <div className="flex items-center">
+            <Input
+                type="text"
+                className="text-center text-4xl font-bold mb-5 
+                        border-none outline-none focus:ring-0 focus:outline-none 
+                        focus-visible:ring-0 focus-visible:outline-none bg-transparent"
+                value={`${weight} KG`}
+                onFocus={(e) => e.target.select()} 
+                onChange={handleWeightChange}
+            />
+        </div>
+                <Slider defaultValue={[weight]} onValueChange={(value) => setWeight(value[0])}  min={0} max={100} step={5}/>
             </div>
             <Button onClick={HandleNext} className='mx-auto block w-full'>Next</Button>
         </TabsContent>
         <TabsContent value="reps" className="w-full">
             <div className='my-8'>
-                <p className='text-center text-4xl font-bold mb-5'>{reps}</p>
-                <Slider defaultValue={reps} onValueChange={(value) => {setReps(value)}}  min={1} max={20} step={1}/>
+                <Input 
+                    type='number' 
+                    className='text-center text-4xl font-bold mb-5 
+                        border-none outline-none focus:ring-0 focus:outline-none 
+                        focus-visible:ring-0 focus-visible:outline-none bg-transparent' 
+                    value={reps}
+                    onFocus={(e) => e.target.select()} 
+                    onChange={(e)  => {setReps(Number(e.target.value))}}/>
+                <Slider defaultValue={[reps]} onValueChange={(value) => {setReps(value[0])}}  min={1} max={20} step={1}/>
             </div>
             <Button onClick={HandleNext} className='mx-auto block w-full'>Next</Button>
         </TabsContent>
