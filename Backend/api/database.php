@@ -205,4 +205,83 @@
 
         return $exercises;
     }
+
+    function GetAllExercisesFromSession($sessionID) {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "SELECT 
+                sessions.id AS session_id, sessions.name AS session_name, sessions.created_at,
+                session_exercises.id AS session_exercise_id, session_exercises.order_index,
+                exercises.id AS exercise_id, exercises.name AS exercise_name, session_exercises.sets_count
+            FROM sessions
+            LEFT JOIN session_exercises ON sessions.id = session_exercises.session_id
+            LEFT JOIN exercises ON session_exercises.exercise_id = exercises.id
+            WHERE sessions.id = ?
+            ORDER BY sessions.created_at DESC, session_exercises.order_index ASC
+        "); 
+
+
+        mysqli_stmt_bind_param($stmt, "i", $sessionID);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        $sessions = array();
+
+        while ($row = mysqli_fetch_assoc($result)) {
+            $sessionID = $row['session_id'];
+
+            // If this session is not in the array, add it
+            if (!isset($sessions[$sessionID])) {
+                $sessions[$sessionID] = [
+                    'id' => $sessionID,
+                    'name' => $row['session_name'],
+                    'created_at' => $row['created_at'],
+                    'exercises' => [] // Empty array to hold exercises
+                ];
+            }
+
+            // If the session has an exercise, add it to the exercises array
+            if ($row['exercise_id']) {
+                $sessions[$sessionID]['exercises'][] = [
+                    'id' => $row['exercise_id'],
+                    'name' => $row['exercise_name'],
+                    'orderIndex' => $row['order_index'],
+                    'sets' => $row['sets_count'],
+                    'session_exercise_id' => $row['session_exercise_id']
+                ];
+            }
+        }
+
+        return array_values($sessions);
+    }
+
+    function registerSet($set) {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "INSERT INTO sets (weight, reps, session_exercise_id, set_number) VALUES (?, ?, ?, ?)");
+        mysqli_stmt_bind_param($stmt, "iiii", $set['weight'], $set['reps'], $set['session_exercise_id'], $set['set_number']);
+        mysqli_stmt_execute($stmt);
+
+        $response = array(
+            "success" => true,
+            "message" => "Set registered"
+        );
+
+        return $response;
+    }
+
+    function GetSetHistory($sessionExerciseID, $setNumber) {
+        global $conn;
+
+        $stmt = mysqli_prepare($conn, "SELECT weight, reps, DATE_FORMAT(created_at, '%d.%m.%Y') AS createdAt FROM sets WHERE session_exercise_id = ? AND set_number = ?
+                                ORDER BY created_at DESC"
+        );
+        mysqli_stmt_bind_param($stmt, "ii", $sessionExerciseID, $setNumber);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
+
+        return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+
 ?>
+
