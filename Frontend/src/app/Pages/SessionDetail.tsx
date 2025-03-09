@@ -125,9 +125,6 @@ const SessionDetail = () => {
   return (
     <>
       <Navbar/>
-      <div className="relative">
-        <Progress value={progress} className="mb-6 sticky top-0"/>
-      </div>
       <div className="flex flex-col h-full p-10">
           <header className="flex flex-col pb-2">
               <h1 className="text-3xl font-bold mb-2">{session[0].name}</h1>
@@ -136,6 +133,9 @@ const SessionDetail = () => {
                 <Badge className="ml-auto">Set {currentSetIndex}</Badge>
               </div>
           </header>
+          <div className="relative">
+            <Progress value={progress} className="mb-6 sticky top-0"/>
+          </div>
           <SetDetails 
             sessionExerciseID={session[0].exercises[currentExerciseIndex].session_exercise_id} 
             exerciseSet={currentSetIndex}

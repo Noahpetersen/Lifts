@@ -40,7 +40,7 @@ const Navbar = () => {
             <AvatarFallback>U</AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="z-100">
           <DropdownMenuItem className="flex flex-col items-center gap-2">
             <NavLink to={"/create"} className="cursor-pointer">
                 Create Session
