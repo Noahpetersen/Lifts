@@ -1,6 +1,25 @@
 <?php 
-    include_once("env.php");
+    // Load environment variables from .env file
+    $envFilePath = dirname(__DIR__, 2) . '/.env';
+    if (file_exists($envFilePath)) {
+        $envVars = parse_ini_file($envFilePath);
+        
+        $servername = $envVars['SERVER_NAME'] ?? '';
+        $username = $envVars['USER_NAME'] ?? '';
+        $password = $envVars['PASSWORD'] ?? '';
+        $database = $envVars['DATABASE'] ?? '';
+        $port = $envVars['PORT'] ?? 3306;
+    } else {
+        die("Error: .env file not found.");
+    }
+
+    // Create database connection using environment variables
     $conn = new mysqli($servername, $username, $password, $database, $port);
+    
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
 
     function startSession(string $email, $persistant = false) {
         session_set_cookie_params([
